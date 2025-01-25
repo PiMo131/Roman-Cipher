@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Disc</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .disc-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        .disc {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .inner-disc {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #007BFF;
+            border-radius: 50%;
+            background-color: #d3d3d3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center;
+        }
+        .letters {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cipher Disc</h2>
+        <label for="shift">Shift (e.g., +3 or -5):</label>
+        <input type="number" id="shift" placeholder="Enter shift value">
+
+        <label for="inputText">Input Text:</label>
+        <textarea id="inputText" placeholder="Type your text here..."></textarea>
+
+        <label for="outputText">Encoded Text:</label>
+        <textarea id="outputText" placeholder="Encoded text will appear here..." readonly></textarea>
+
+        <button onclick="encodeText()">Encode</button>
+
+        <div class="disc-container">
+            <div class="disc">
+                <div class="letters" id="outerLetters"></div>
+            </div>
+            <div class="inner-disc" id="innerDisc">
+                <div class="letters" id="innerLetters"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createDisc(elementId, alphabet) {
+            const element = document.getElementById(elementId);
+            let html = '';
+            const angleStep = 360 / alphabet.length;
+
+            for (let i = 0; i < alphabet.length; i++) {
+                const angle = i * angleStep;
+                html += `<div style="position: absolute; transform: rotate(${angle}deg) translate(0, -110px);">${alphabet[i]}</div>`;
+            }
+            element.innerHTML = html;
+        }
+
+        function rotateDisc(elementId, shift) {
+            const element = document.getElementById(elementId);
+            const rotation = (shift * (360 / 26)) % 360;
+            element.style.transform = `rotate(${rotation}deg)`;
+        }
+
+        function encodeText() {
+            const shift = parseInt(document.getElementById('shift').value) || 0;
+            const inputText = document.getElementById('inputText').value;
+            const outputText = document.getElementById('outputText');
+
+            let result = '';
+
+            for (let i = 0; i < inputText.length; i++) {
+                const char = inputText[i];
+
+                if (char.match(/[a-z]/i)) {
+                    const charCode = char.charCodeAt(0);
+                    const base = char >= 'a' ? 97 : 65;
+                    result += String.fromCharCode(((charCode - base + shift) % 26 + 26) % 26 + base);
+                } else {
+                    result += char;
+                }
+            }
+
+            rotateDisc('innerDisc', shift);
+            outputText.value = result;
+        }
+
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        createDisc('outerLetters', alphabet);
+        createDisc('innerLetters', alphabet);
+    </script>
+</body>
+</html>
